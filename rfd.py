@@ -1,99 +1,97 @@
-# Code from RFD900 Balloon Telemetry Senior Capstone Final Project Report
-# Madison Martinsen, Annie Bachman, Michael Valentino-Manno
-#This version has been modified by Benjamin Mock
+"""
+South Side Hackerspace: Chicago
 
-# Import Packages
+Based on code from RFD900 Balloon Telemetry Senior Capstone Final Project Report(Madison Martinsen, Annie Bachman, Michael Valentino-Manno)
+"""
+
 import tkinter as tk
 import serial
 import time
-#import tkinter as tk
 import csv
-# Prove timing intervals for FDR
-#from datetime import datetime
-#now = datetime.now()
-#current_time = now.strftime("%H:%M:%S")
-#print("Time = ", current_time, "\n")
-global packet_count
+
 packet_count = 0
-global succ
 succ = 0
-def Label_Update(ser):
-    global succ
-    #now = datetime.now()ss
-    #current_time = now.strftime("%H:%M:%S")
-    #print("Time = ", current_time, "\n")
-    global packet_count
-#    packet_count=packet_count+1
+Decoded_Raw_Data = []
+Final_Data = []
+# Degree Symbol for GUI
+degree_sign = u"\N{DEGREE SIGN}"
+
+fix_sources = [
+    (0, "No Fix"),
+    (1, "Dead Reckoning"),
+    (2, "2D"),
+    (3, "3D"),
+    (4, "GNSS + Dead Reckoning"),
+]
+
+# CSV HEADERS
+header = ["Packet Number", "SIV", "FixType", "Latitude", \
+    "Longitude", "Altitude", "Year", "Month", "Day", \
+    "Hour", "Min", "Sec", "NNV", "NEV", "NDV", "Battery" ,\
+    "3v3 Supply", "5v Supply", "Radio Supply", "Analog Internal", \
+    "Analog External", "Altimeter Temp", "Digital Internal", \
+    "Digital Eternal", "Pressure", "Accel A", "Accel Y", "Accel z", \
+    "Pitch", "Roll", "Yaw"]
+
+
+def Label_Update(serial_port):
     packet=lat=lon=0
-    siv=fix=alt=year=month=day=hour=minute=sec=nedN=nedE=nedD=bat=bat33=bat51=bat52=aint=aext=ptemp=dint=dent=pres=ax=ay=az=pitch=roll=yaw=a1=y=xx=xxx=xxxx=""
-    ser.reset_input_buffer()
-    y = ser.readline()
+    siv=fix=alt=year=month=day=hour=minute=sec=nedN=nedE=nedD=bat=bat33=bat51=bat52=aint=aext=ptemp=dint=dent=pres=ax=ay=az=pitch=roll=yaw=a1=string_csv_data=""
+    serial_port.reset_input_buffer()
+    source_data = serial_port.readline()
 
     # CSV
-    Decoded_Raw_Data = y.decode("utf-8")
+    Decoded_Raw_Data = source_data.decode("utf-8")
     Final_Data = Decoded_Raw_Data.split(",")
+    string_csv_data = str(Decoded_Raw_Data).split(",")
     
     # write a new line in the csv if there is data
     if len(Final_Data) > 10:
         with open(fileName, "a", newline = '\n') as f:
-            writer = csv.writer(f, delimiter=',')
-            writer.writerow(Final_Data)
-            packet_count = packet_count + 1
-            file.close()
-            
-    xx = y.decode('utf-8')
-    xxx = str(xx)
-    xxxx = xxx.split(",")
-    
+            csv.writer(f, delimiter=',').writerow(Final_Data)
+            packet_count += 1
+
     # Save radio data
-    if len(xxxx) >= 31:
-        packet = int(xxxx[0].strip())
-        siv = xxxx[1].strip()
-        fix = xxxx[2].strip()
-        lat = float(xxxx[3].strip())
+    if len(string_csv_data) >= 31:
+        packet = int(string_csv_data[0].strip())
+        siv = string_csv_data[1].strip()
+        fix = string_csv_data[2].strip()
+        lat = float(string_csv_data[3].strip())
         lat = lat * .0000001
-        lon = float(xxxx[4].strip())
+        lon = float(string_csv_data[4].strip())
         lon = lon * .0000001
-        alt = float(xxxx[5].strip())
+        alt = float(string_csv_data[5].strip())
         alt = alt / 1000
-        year = xxxx[6].strip()
-        month = xxxx[7].strip()
-        day = xxxx[8].strip()
-        hour = xxxx[9].strip()
-        minute = xxxx[10].strip()
-        sec = xxxx[11].strip()
-        nedN = xxxx[12].strip()
-        nedE = xxxx[13].strip()
-        nedD = xxxx[14].strip()
-        bat = xxxx[15].strip()
-        bat33 = xxxx[16].strip()
-        bat51 = xxxx[17].strip()
-        bat52 = xxxx[18].strip()
-        aint = xxxx[19].strip()
-        aext = xxxx[20].strip()
-        ptemp = xxxx[21].strip()
-        dint = xxxx[22].strip()
-        dent = xxxx[23].strip()
-        pres = xxxx[24].strip()
-        ax = xxxx[25].strip()
-        ay = xxxx[26].strip()
-        az = xxxx[27].strip()
-        pitch = xxxx[28].strip()
-        roll = xxxx[29].strip()
-        yaw = xxxx[30].strip()
+        year = string_csv_data[6].strip()
+        month = string_csv_data[7].strip()
+        day = string_csv_data[8].strip()
+        hour = string_csv_data[9].strip()
+        minute = string_csv_data[10].strip()
+        sec = string_csv_data[11].strip()
+        nedN = string_csv_data[12].strip()
+        nedE = string_csv_data[13].strip()
+        nedD = string_csv_data[14].strip()
+        bat = string_csv_data[15].strip()
+        bat33 = string_csv_data[16].strip()
+        bat51 = string_csv_data[17].strip()
+        bat52 = string_csv_data[18].strip()
+        aint = string_csv_data[19].strip()
+        aext = string_csv_data[20].strip()
+        ptemp = string_csv_data[21].strip()
+        dint = string_csv_data[22].strip()
+        dent = string_csv_data[23].strip()
+        pres = string_csv_data[24].strip()
+        ax = string_csv_data[25].strip()
+        ay = string_csv_data[26].strip()
+        az = string_csv_data[27].strip()
+        pitch = string_csv_data[28].strip()
+        roll = string_csv_data[29].strip()
+        yaw = string_csv_data[30].strip()
         if succ == 0:
             succ=packet
+
     if fix != "":
-        if int(fix) == 0:
-            a1 = "No Fix"
-        elif int(fix) == 1:
-            a1 ="Dead Reckoning"
-        elif int(fix) == 2:
-            a1 ="2D"
-        elif int(fix) == 3:
-            a1 ="3D"
-        elif int(fix) == 4:
-            a1 ="GNSS + Dead Reckoning"
+        a1 = fix_sources[int(fix)]
     else:
         a1 = "No Data"
         packet = 1 #
@@ -149,26 +147,11 @@ def Label_Update(ser):
 
 ##################################################################
 
-Decoded_Raw_Data = []
-Final_Data = []
-
-# CSV HEADERS
-header = ["Packet Number", "SIV", "FixType", "Latitude", \
-    "Longitude", "Altitude", "Year", "Month", "Day", \
-    "Hour", "Min", "Sec", "NNV", "NEV", "NDV", "Battery" ,\
-    "3v3 Supply", "5v Supply", "Radio Supply", "Analog Internal", \
-    "Analog External", "Altimeter Temp", "Digital Internal", \
-    "Digital Eternal", "Pressure", "Accel A", "Accel Y", "Accel z", \
-    "Pitch", "Roll", "Yaw"]
-
-# Degree Symbol for GUI
-degree_sign = u"\N{DEGREE SIGN}"
-
 # User enter serial port
 while True:
     # Open Serial Port, if it doesn't work, reprompt user
     try:
-        ser = serial.Serial( port = "/dev/cu.usbserial-AB0JNQSY", baudrate = 57600, parity = serial.PARITY_NONE, stopbits = serial.STOPBITS_ONE, bytesize = serial.EIGHTBITS, timeout = 1 )
+        serial_port = serial.Serial( port = "/dev/cu.usbserial-AB0JNQSY", baudrate = 57600, parity = serial.PARITY_NONE, stopbits = serial.STOPBITS_ONE, bytesize = serial.EIGHTBITS, timeout = 1 )
         break
     except IOError:
         print("Device not found in specified COM port. Please try again.\n")
@@ -179,20 +162,15 @@ blank = []
 fileName = "RFD900x_Data.csv"
 file = open(fileName, "a")
 file.close()
+
 with open(fileName, "a", newline = '\n') as f:
     writer = csv.writer(f, delimiter=',')
     writer.writerow(header)
-    file.close()
+
 print(fileName + " created to hold data. If file exists, data will be appended\n")
 # MSGC LOGO
-# imgpath = 'NEBP_logo.png'
-# img = tk.PhotoImage(file=imgpath)
-# img = img.zoom(3)
-# img = img.subsample(8)
-# w1 = tk.Label(root, image=img).grid(row=0,column=1, padx=(0, 0))
 while True:
-    Label_Update(ser)
+    Label_Update(serial_port)
     time.sleep(0.5)
     root.update_idletasks()
     root.update()
-    #    root.mainloop()
