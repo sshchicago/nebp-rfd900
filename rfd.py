@@ -39,6 +39,10 @@ def Label_Update(serial_port):
     siv=fix=alt=year=month=day=hour=minute=sec=nedN=nedE=nedD=bat=bat33=bat51=bat52=aint=aext=ptemp=dint=dent=pres=ax=ay=az=pitch=roll=yaw=a1=string_csv_data=""
     serial_port.reset_input_buffer()
     source_data = serial_port.readline()
+    global packet_count
+    global succ
+    global Decoded_Raw_Data
+    global Final_Data
 
     # CSV
     Decoded_Raw_Data = source_data.decode("utf-8")
@@ -125,14 +129,15 @@ def Label_Update(serial_port):
     )
                         
     # Col 1
+    xxxx = str(siv)
     Data2 = tk.Label(root, font = ("Helvetica", "22"))
     Data2.grid(row=1,column=1,padx=(5, 5), pady=(0,0))
     Data2.config(text=(
-        'Satellites In View: ' + str(siv)+ "\n" +
-        'Fix Type: ' + a1 + " (" + str(fix)+ ")" + "\n" +
+        'Satellites In View: ' + str(siv) + "\n" +
+        'Fix Type: ' + a1[1] + " (" + str(fix) + ")" + "\n" +
         'Latitude: ' + str(round(float(lat), 6)) + "\n" +
         'Longitude: ' + str(round(float(lon), 6)) + "\n" +
-        'Altitude: ' + str(alt)+ " m\n" +
+        'Altitude: ' + str(alt) + " m\n" +
         'Pressure: ' + str(pres) + " mbar\n\n" +
         'NedNorthVel: ' + str(nedN) + " mm/s\n" +
         'NedEastVel: ' + str(nedE) + " mm/s\n" +
@@ -140,9 +145,9 @@ def Label_Update(serial_port):
         'Acceleration X: ' + str(ax)+ " m/s\u00b2 \n" +
         'Acceleration Y: ' + str(ay)+ " m/s\u00b2 \n" +
         'Acceleration Z: ' + str(az)+ " m/s\u00b2 \n" +
-        'Pitch: ' + str(pitch)+ degree_sign +"\n" +
-        'Roll: ' + str(roll)+ degree_sign +"\n" +
-        'Yaw: ' + str(yaw)+ degree_sign +""
+        'Pitch: ' + str(pitch)+ degree_sign + "\n" +
+        'Roll: ' + str(roll)+ degree_sign + "\n" +
+        'Yaw: ' + str(yaw)+ degree_sign + ""
         ))
 
 ##################################################################
