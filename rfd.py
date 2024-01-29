@@ -16,13 +16,13 @@ Final_Data = []
 # Degree Symbol for GUI
 degree_sign = u"\N{DEGREE SIGN}"
 
-fix_sources = [
-    (0, "No Fix"),
-    (1, "Dead Reckoning"),
-    (2, "2D"),
-    (3, "3D"),
-    (4, "GNSS + Dead Reckoning"),
-]
+fix_sources = {
+    0: "No Fix",
+    1: "Dead Reckoning",
+    2: "2D",
+    3: "3D",
+    4: "GNSS + Dead Reckoning",
+}
 
 # CSV HEADERS
 header = ["Packet Number", "SIV", "FixType", "Latitude", \
@@ -36,7 +36,7 @@ header = ["Packet Number", "SIV", "FixType", "Latitude", \
 
 def Label_Update(serial_port):
     packet=lat=lon=0
-    siv=fix=alt=year=month=day=hour=minute=sec=nedN=nedE=nedD=bat=bat33=bat51=bat52=aint=aext=ptemp=dint=dent=pres=ax=ay=az=pitch=roll=yaw=a1=string_csv_data=""
+    siv=fix=alt=year=month=day=hour=minute=sec=nedN=nedE=nedD=bat=bat33=bat51=bat52=aint=aext=ptemp=dint=dent=pres=ax=ay=az=pitch=roll=yaw=fixType=string_csv_data=""
     serial_port.reset_input_buffer()
     source_data = serial_port.readline()
     global packet_count
@@ -57,7 +57,11 @@ def Label_Update(serial_port):
 
     # Save radio data
     if len(string_csv_data) >= 31:
-        packet = int(string_csv_data[0].strip())
+        try:
+            packet = int(string_csv_data[0].strip())
+        except ValueError as ve:
+            print("Invalid packet number: " + string_csv_data[0])
+            packet = 1
         siv = string_csv_data[1].strip()
         fix = string_csv_data[2].strip()
         lat = float(string_csv_data[3].strip())
@@ -94,10 +98,12 @@ def Label_Update(serial_port):
         if succ == 0:
             succ=packet
 
-    if fix != "":
-        a1 = fix_sources[int(fix)]
+    if fix != "" and int(fix) in (fix_sources.keys()):
+        fixType = fix_sources[int(fix)]
     else:
-        a1 = "No Data"
+        if fix != "":
+            print("Invalid fix: " + fix)
+        fixType = "No/Invalid Fix Data"
         packet = 1 #
         lat = 0#
         lon = 0#
@@ -134,7 +140,7 @@ def Label_Update(serial_port):
     Data2.grid(row=1,column=1,padx=(5, 5), pady=(0,0))
     Data2.config(text=(
         'Satellites In View: ' + str(siv) + "\n" +
-        'Fix Type: ' + a1[1] + " (" + str(fix) + ")" + "\n" +
+        'Fix Type: ' + fixType + " (" + str(fix) + ")" + "\n" +
         'Latitude: ' + str(round(float(lat), 6)) + "\n" +
         'Longitude: ' + str(round(float(lon), 6)) + "\n" +
         'Altitude: ' + str(alt) + " m\n" +
